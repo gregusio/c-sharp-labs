@@ -1,0 +1,87 @@
+﻿@page "/sites"
+@rendermode InteractiveServer
+@using System.Text.RegularExpressions;
+
+<h3>Sites</h3>
+<p>To add a site type their name then push plus button</p>
+
+<input type="text" @bind="@PageUrl" @oninput="@((e) => TrimPageUrl((string)e.Value))" />
+<button class="btn btn-primary" @onclick="AddPage">+</button>
+
+<div style="text-align: center;">
+    <h3>@PageName</h3>
+</div>
+
+
+@if(pages.Count > 0)
+{
+    <div class="grid-container">
+        @foreach (var page in pages)
+        {
+            <div class="grid-item">
+                <a href=@(page.Html)>@(page.Name)</a>
+            </div>
+        }
+    </div>
+}
+else
+{
+    <p>No sites</p>
+}
+
+
+<style>
+    .grid-container {
+        display: grid;
+        grid-template-columns: auto auto auto;
+        background-color: #2196F3;
+        padding: 10px;
+    }
+
+    .grid-item {
+        background-color: rgba(255, 255, 255, 0.9);
+        border: 1px solid rgba(0, 0, 0, 0.8);
+        padding: 20px;
+        font-size: 30px;
+        text-align: center;
+    }
+</style>
+@code {
+    public String PageUrl { get; set; }
+    public String PageName { get; set; }
+    public List<Page> pages = new List<Page>();
+
+    public void TrimPageUrl(string url)
+    {
+        var regex = new Regex("\\.[^\\.]*");
+        PageName = regex.Match(url).ToString().Trim('.');
+    }
+
+    public void AddPage()
+    {
+        pages.Add(new Page
+            {
+                Url = PageUrl,
+                Name = PageName
+            });
+
+        PageUrl = "";
+        PageName = "";
+    }
+
+    public class Page
+    {
+        public string Url { get; set; }
+        public string Name { get; set; }
+        public string Html
+        {
+            get
+            {
+                return "https://www." + Name + ".pl";
+            }
+            private set {}
+        }
+
+    }
+
+}
